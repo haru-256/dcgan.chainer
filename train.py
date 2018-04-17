@@ -42,7 +42,7 @@ def main():
     opt_gen = make_optimizer(gen)
     opt_dis = make_optimizer(dis)
 
-    # Load the CIFAR10 dataset if args.dataset is not specified
+    # Load the mnist dataset
     train, _ = chainer.datasets.get_mnist(withlabel=False, scale=255., ndim=3)
 
     train_iter = chainer.iterators.SerialIterator(train, batch_size)
