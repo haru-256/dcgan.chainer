@@ -4,7 +4,6 @@ import os
 
 import numpy as np
 import matplotlib.pyplot as plt
-import numpy as np
 import chainer
 import chainer.backends.cuda
 from chainer import Variable
