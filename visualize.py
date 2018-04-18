@@ -25,9 +25,11 @@ def combine_images(generated_images):
     return combined_image
 
 
+# extention is a callable object that takes a Trainer object as argument.
 def out_generated_image(gen, dis, rows, cols, seed, dst):
-    @chainer.training.make_extension()
-    def make_image(trainer):
+    # Decorater that adds some atrribute to given functions
+    @chainer.training.make_extension(trigger=(10, "epoch"))
+    def make_image(trainer):  # function takes trainer object as an argument
         np.random.seed(seed)
         n_images = rows * cols
         xp = gen.xp
@@ -38,13 +40,13 @@ def out_generated_image(gen, dis, rows, cols, seed, dst):
         np.random.seed()
 
         x = x * 127.5 + 127.5
-        x = x.transpose(0, 2, 3, 1) # NCHW->NHWCに変形
+        x = x.transpose(0, 2, 3, 1)  # NCHW->NHWCに変形
         x = combine_images(x)
         plt.imshow(x, cmap=plt.cm.gray)
         plt.axis("off")
         preview_dir = '{}/preview'.format(dst)
         preview_path = preview_dir +\
-                       '/image_{:}epoch.png'.format(trainer.updater.epoch)
+            '/image_{:}epoch.png'.format(trainer.updater.epoch)
         if not os.path.exists(preview_dir):
             os.makedirs(preview_dir)
         plt.tight_layout()
