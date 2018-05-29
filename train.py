@@ -4,17 +4,18 @@ from chainer.training import extensions
 
 from discriminator import Discriminator
 from generator import Generator
-from updater import DCGANUpdater
+# from updater import DCGANUpdater
+from updater2 import DCGANUpdater
 from visualize import out_generated_image
 
 
 def main():
-    gpu = 0
+    gpu = 1
     batch_size = 128
     n_hidden = 100
     epoch = 100
     seed = 0
-    out = "result"
+    out = "result_updater2"
 
     print('GPU: {}'.format(gpu))
     print('# Minibatch-size: {}'.format(batch_size))
@@ -58,16 +59,17 @@ def main():
         device=gpu)
     trainer = training.Trainer(updater, (epoch, 'epoch'), out=out)
 
-    snapshot_interval = (1, 'epoch')
-    display_interval = (1, 'iteration')
+    snapshot_interval = (5, 'epoch')
+    display_interval = (1, 'epoch')
     trainer.extend(
-        extensions.snapshot(filename='snapshot_iter_{.updater.iteration}.npz'),
+        extensions.snapshot(
+            filename='snapshot_epoch_{.updater.epoch}.npz'),
         trigger=snapshot_interval)
     trainer.extend(
-        extensions.snapshot_object(gen, 'gen_iter_{.updater.iteration}.npz'),
+        extensions.snapshot_object(gen, 'gen_epoch_{.updater.epoch}.npz'),
         trigger=snapshot_interval)
     trainer.extend(
-        extensions.snapshot_object(dis, 'dis_iter_{.updater.iteration}.npz'),
+        extensions.snapshot_object(dis, 'dis_epoch_{.updater.epoch}.npz'),
         trigger=snapshot_interval)
     trainer.extend(extensions.LogReport())
     trainer.extend(
@@ -80,8 +82,8 @@ def main():
         trigger=display_interval)
     trainer.extend(extensions.ProgressBar())
     trainer.extend(
-        out_generated_image(gen, dis, 5, 5, seed, out),
-        trigger=snapshot_interval)
+        out_generated_image(gen, dis, 10, 10, seed, out),
+        trigger=display_interval)
     trainer.extend(
         extensions.PlotReport(
             ['gen/loss', 'dis/loss'], x_key='epoch', file_name='loss.png'))

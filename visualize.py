@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-
-import os
-
+import pathlib
 import numpy as np
 import matplotlib.pyplot as plt
 import chainer
@@ -25,30 +22,40 @@ def combine_images(generated_images):
     return combined_image
 
 
-# extention is a callable object that takes a Trainer object as argument.
 def out_generated_image(gen, dis, rows, cols, seed, dst):
-    # Decorater that adds some atrribute to given functions
-    @chainer.training.make_extension(trigger=(10, "epoch"))
-    def make_image(trainer):  # function takes trainer object as an argument
-        np.random.seed(seed)
+    @chainer.training.make_extension()
+    def make_image(trainer):
         n_images = rows * cols
-        xp = gen.xp
-        z = Variable(xp.asarray(gen.make_hidden(n_images)))
+
+        np.random.seed(seed)  # fix seed
+        xp = gen.xp  # get module
+
+        # test, evaluationの時は以下の２つを設定しなければならない
+        # https://qiita.com/mitmul/items/1e35fba085eb07a92560
+        # 'train'をFalseにすることで，train時とテスト時で挙動が異なるlayer(BN, Dropout)
+        # を制御する
         with chainer.using_config('train', False):
-            x = gen(z)
+            # 'enable_backprop'をFalseとすることで，無駄な計算グラフの構築を行わない
+            # ようにしメモリの消費量を抑える.
+            with chainer.using_config('enable_backprop', False):
+                z = Variable(xp.asarray(gen.make_hidden(n_images)))
+                x = gen(z)
+
         x = chainer.backends.cuda.to_cpu(x.data)
         np.random.seed()
 
-        x = x * 127.5 + 127.5
+        x = (x * 127.5 + 127.5) / 255  # 0~255に戻し0~1へ変形
         x = x.transpose(0, 2, 3, 1)  # NCHW->NHWCに変形
         x = combine_images(x)
+
         plt.imshow(x, cmap=plt.cm.gray)
         plt.axis("off")
-        preview_dir = '{}/preview'.format(dst)
-        preview_path = preview_dir +\
-            '/image_{:}epoch.png'.format(trainer.updater.epoch)
-        if not os.path.exists(preview_dir):
-            os.makedirs(preview_dir)
+        preview_dir = pathlib.Path('{}/preview'.format(dst))
+        preview_path = preview_dir /\
+            'image_{:}epoch.jpg'.format(trainer.updater.epoch)
+        if not preview_dir.exists():
+            preview_dir.mkdir()
+        plt.title("epoch: {}".format(trainer.updater.epoch), fontsize=18)
         plt.tight_layout()
         plt.savefig(preview_path)
 

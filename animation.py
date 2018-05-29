@@ -1,20 +1,21 @@
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import cv2
+from PIL import Image, ImageFilter
 import pathlib
 
-fig = plt.figure(figsize=(5, 5))
+number = 1  # nmber of experiments
+seed = 1  # seed
+strings = "{0}_{1}".format(number, seed)
+# Pillow のGIF生成，画像読み込みは以下のサイトを参照
+# https://note.nkmk.me/python-pillow-gif/
+# https://note.nkmk.me/python-pillow-basic/
+#path = pathlib.Path("result_{}/preview".format(strings))
+path = pathlib.Path("./result_updater2/preview")
 
-path = pathlib.Path("result/preview")
-
-ims = []
-
+# store image to use as frame to array "imgs"
+imgs = []
 for epoch in range(1, 101):
-    img = cv2.imread(str(path / "image_{}epoch.png".format(epoch)), 0)
-    frame = plt.imshow(img, cmap=plt.cm.gray)
-    ims.append([frame])
-ani = animation.ArtistAnimation(fig, ims, interval=150)
-# ani.save('anim.mp4', writer="ffmpeg")
-plt.axis("off")
-ani.save('anim.gif', writer="imagemagick")
-plt.show()
+    img = Image.open(path / "image_{}epoch.jpg".format(epoch))
+    imgs.append(img)
+
+# make gif
+imgs[0].save('anim_{}.gif'.format(strings), save_all=True, append_images=imgs[1:],
+             optimize=False, duration=200, loop=0)
