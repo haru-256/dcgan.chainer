@@ -23,7 +23,7 @@ def combine_images(generated_images):
 
 
 def out_generated_image(gen, dis, rows, cols, seed, dst):
-    @chainer.training.make_extension()
+    @chainer.training.make_extension(trigger=(1, 'epoch'))
     def make_image(trainer):
         n_images = rows * cols
 

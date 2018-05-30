@@ -90,7 +90,10 @@ def main():
         trigger=display_interval)
     trainer.extend(
         extensions.PlotReport(
-            ['gen/loss', 'dis/loss'], x_key='epoch', file_name='loss.jpg'))
+            ['gen/loss', 'dis/loss'],
+            x_key='epoch',
+            file_name='loss.jpg',
+            grid=False))
 
     # Run the training
     trainer.run()
