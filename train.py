@@ -5,7 +5,7 @@ from chainer.training import extensions
 from discriminator import Discriminator
 from generator import Generator
 # from updater import DCGANUpdater
-from updater import DCGANUpdater
+from updater_origin import DCGANUpdater
 from visualize import out_generated_image
 
 
