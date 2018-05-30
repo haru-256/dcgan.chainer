@@ -93,7 +93,8 @@ def main():
             ['gen/loss', 'dis/loss'],
             x_key='epoch',
             file_name='loss.jpg',
-            grid=False))
+            grid=False))  # grid=Falseとしているのは"ggplot"ではすでにgridが書かれているため．
+    # 詳細は https://github.com/chainer/chainer/blob/v4.1.0/chainer/training/extensions/plot_report.py#L153-L154 参照
 
     # Run the training
     trainer.run()
