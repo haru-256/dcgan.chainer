@@ -50,6 +50,7 @@ def out_generated_image(gen, dis, rows, cols, seed, dst):
 
         plt.imshow(x, cmap=plt.cm.gray)
         plt.axis("off")
+        # plt.grid("off")
         preview_dir = pathlib.Path('{}/preview'.format(dst))
         preview_path = preview_dir /\
             'image_{:}epoch.jpg'.format(trainer.updater.epoch)
