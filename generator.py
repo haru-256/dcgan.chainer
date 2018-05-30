@@ -35,19 +35,36 @@ class Generator(chainer.Chain):
         with self.init_scope():
             w = chainer.initializers.Normal(wscale)  # initializers
 
-            self.l0 = L.Linear(self.n_hidden, 1024, initialW=w)
-            self.l1 = L.Linear(
-                None, bottom_width * bottom_width * ch, initialW=w)
+            self.l0 = L.Linear(in_size=self.n_hidden, out_size=bottom_width *
+                               bottom_width * ch, initialW=w, nobias=True)
+            # self.l1 = L.Linear(None, bottom_width * bottom_width * ch, initialW=w)
+            self.dc1 = L.Deconvolution2D(
+                in_channels=None,
+                out_channels=ch // 2,
+                ksize=3,
+                stride=2,
+                pad=1,
+                initialW=w,
+                nobias=True)  # (, 7, 7)
             self.dc2 = L.Deconvolution2D(
-                None, ch // 2, 3, 2, 1, initialW=w)  # (, 7, 7)
+                in_channels=None,
+                out_channels=ch // 4,
+                ksize=4,
+                stride=2,
+                pad=1,
+                initialW=w,
+                nobias=True)  # (, 14, 14)
             self.dc3 = L.Deconvolution2D(
-                None, ch // 4, 4, 2, 1, initialW=w)  # (, 14, 14)
-            self.dc4 = L.Deconvolution2D(
-                None, 1, 4, 2, 1, initialW=w)  # (1, 28, 28)
-            self.bn0 = L.BatchNormalization(1024)
-            self.bn1 = L.BatchNormalization(bottom_width * bottom_width * ch)
-            self.bn2 = L.BatchNormalization(ch // 2)
-            self.bn3 = L.BatchNormalization(ch // 4)
+                in_channels=None,
+                out_channels=1,
+                ksize=4,
+                stride=2,
+                pad=1,
+                initialW=w,
+                nobias=True)  # (1, 28, 28)
+            self.bn0 = L.BatchNormalization(bottom_width * bottom_width * ch)
+            self.bn1 = L.BatchNormalization(ch // 2)
+            self.bn2 = L.BatchNormalization(ch // 4)
 
     def make_hidden(self, batchsize):
         """
@@ -61,12 +78,11 @@ class Generator(chainer.Chain):
 
     def __call__(self, z):
         h = F.relu(self.bn0(self.l0(z)))
-        h = F.relu(self.bn1(self.l1(h)))
         h = F.reshape(h, (len(z), self.ch, self.bottom_width,
                           self.bottom_width))  # dataformat is NCHW
+        h = F.relu(self.bn1(self.dc1(h)))
         h = F.relu(self.bn2(self.dc2(h)))
-        h = F.relu(self.bn3(self.dc3(h)))
-        x = F.tanh(self.dc4(h))
+        x = F.tanh(self.dc3(h))
         return x
 
 

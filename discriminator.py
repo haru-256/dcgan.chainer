@@ -15,38 +15,36 @@ class Discriminator(chainer.Chain):
             self.c0 = L.Convolution2D(
                 in_channels=ch,
                 out_channels=64,
-                ksize=5,
+                ksize=4,
                 stride=2,
-                pad=2,
+                pad=1,
                 initialW=w)
             self.c1 = L.Convolution2D(
                 in_channels=None,
                 out_channels=32,
-                ksize=3,
+                ksize=4,
                 stride=2,
                 pad=1,
-                initialW=w)
+                initialW=w,
+                nobias=True)
             self.c2 = L.Convolution2D(
                 in_channels=None,
                 out_channels=16,
                 ksize=3,
-                stride=1,
+                stride=2,
                 pad=1,
-                initialW=w)
+                initialW=w,
+                nobias=True)
+            self.l3 = L.Linear(in_size=None, out_size=1, initialW=w)
 
-            # self.l4 = L.Linear(in_size=bottom_width*bottom_width*ch, out_size=1, initialW=w)
-            self.l4 = L.Linear(in_size=None, out_size=1, initialW=w)
-
-            # self.bn0 = L.BatchNormalization(size=ch//8, use_gamma=False)
-            self.bn1 = L.BatchNormalization(size=32, use_gamma=False)
-            self.bn2 = L.BatchNormalization(size=16, use_gamma=False)
-            self.bn3 = L.BatchNormalization(size=8, use_gamma=False)
+            self.bn1 = L.BatchNormalization(size=32)
+            self.bn2 = L.BatchNormalization(size=16)
 
     def __call__(self, x):
         h = F.leaky_relu(self.c0(x))
         h = F.leaky_relu(self.bn1(self.c1(h)))
         h = F.leaky_relu(self.bn2(self.c2(h)))
-        y = self.l4(h)  # conv->linear では勝手にreshapeが適用される
+        y = self.l3(h)  # conv->linear では勝手にreshapeが適用される
 
         return y
 

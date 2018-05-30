@@ -5,22 +5,24 @@ from chainer.training import extensions
 from discriminator import Discriminator
 from generator import Generator
 # from updater import DCGANUpdater
-from updater2 import DCGANUpdater
+from updater import DCGANUpdater
 from visualize import out_generated_image
 
 
 def main():
-    gpu = 1
+    gpu = -1
     batch_size = 128
     n_hidden = 100
-    epoch = 100
+    epoch = 20
     seed = 0
-    out = "result_updater2"
+    number = 1  # number of experiments
+    out = "result_{0}_{1}".format(number, seed)
 
     print('GPU: {}'.format(gpu))
     print('# Minibatch-size: {}'.format(batch_size))
     print('# n_hidden: {}'.format(n_hidden))
     print('# epoch: {}'.format(epoch))
+    print('# out: {}'.format(out))
     print('')
 
     # Set up a neural network to train
@@ -37,7 +39,7 @@ def main():
     def make_optimizer(model, alpha=0.0002, beta1=0.5):
         optimizer = chainer.optimizers.Adam(alpha=alpha, beta1=beta1)
         optimizer.setup(model)
-        optimizer.add_hook(chainer.optimizer.WeightDecay(0.0001), 'hook_dec')
+        # optimizer.add_hook(chainer.optimizer.WeightDecay(0.0001), 'hook_dec')
         return optimizer
 
     opt_gen = make_optimizer(gen)
@@ -80,13 +82,13 @@ def main():
             'dis/loss',
         ]),
         trigger=display_interval)
-    trainer.extend(extensions.ProgressBar())
+    trainer.extend(extensions.ProgressBar(update_interval=20))
     trainer.extend(
         out_generated_image(gen, dis, 10, 10, seed, out),
         trigger=display_interval)
     trainer.extend(
         extensions.PlotReport(
-            ['gen/loss', 'dis/loss'], x_key='epoch', file_name='loss.png'))
+            ['gen/loss', 'dis/loss'], x_key='epoch', file_name='loss.jpg'))
 
     # Run the training
     trainer.run()
