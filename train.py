@@ -7,6 +7,8 @@ from generator import Generator
 # from updater import DCGANUpdater
 from updater_origin import DCGANUpdater
 from visualize import out_generated_image
+import matplotlib.pyplot as plt
+plt.style.use("ggplot")
 
 
 def main():
@@ -15,7 +17,7 @@ def main():
     n_hidden = 100
     epoch = 20
     seed = 0
-    number = 1  # number of experiments
+    number = 2  # number of experiments
     out = "result_{0}_{1}".format(number, seed)
 
     print('GPU: {}'.format(gpu))

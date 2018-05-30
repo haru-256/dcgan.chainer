@@ -26,7 +26,7 @@ class Generator(chainer.Chain):
     ---------------------
     """
 
-    def __init__(self, n_hidden=100, bottom_width=4, ch=128, wscale=0.02):
+    def __init__(self, n_hidden=100, bottom_width=7, ch=128, wscale=0.02):
         super(Generator, self).__init__()
         self.n_hidden = n_hidden
         self.ch = ch
@@ -41,11 +41,12 @@ class Generator(chainer.Chain):
             self.dc1 = L.Deconvolution2D(
                 in_channels=None,
                 out_channels=ch // 2,
-                ksize=3,
+                ksize=4,
                 stride=2,
                 pad=1,
                 initialW=w,
-                nobias=True)  # (, 7, 7)
+                nobias=True)  # (, 14, 14)
+            """
             self.dc2 = L.Deconvolution2D(
                 in_channels=None,
                 out_channels=ch // 4,
@@ -54,17 +55,17 @@ class Generator(chainer.Chain):
                 pad=1,
                 initialW=w,
                 nobias=True)  # (, 14, 14)
-            self.dc3 = L.Deconvolution2D(
+            """
+            self.dc2 = L.Deconvolution2D(
                 in_channels=None,
                 out_channels=1,
                 ksize=4,
                 stride=2,
                 pad=1,
-                initialW=w,
-                nobias=True)  # (1, 28, 28)
+                initialW=w)  # (1, 28, 28)
             self.bn0 = L.BatchNormalization(bottom_width * bottom_width * ch)
             self.bn1 = L.BatchNormalization(ch // 2)
-            self.bn2 = L.BatchNormalization(ch // 4)
+            # self.bn2 = L.BatchNormalization(ch // 4)
 
     def make_hidden(self, batchsize):
         """
@@ -81,8 +82,9 @@ class Generator(chainer.Chain):
         h = F.reshape(h, (len(z), self.ch, self.bottom_width,
                           self.bottom_width))  # dataformat is NCHW
         h = F.relu(self.bn1(self.dc1(h)))
-        h = F.relu(self.bn2(self.dc2(h)))
-        x = F.tanh(self.dc3(h))
+        x = F.tanh(self.dc2(h))
+        # h = F.relu(self.bn2(self.dc2(h)))
+        # x = F.tanh(self.dc3(h))
         return x
 
 
