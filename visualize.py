@@ -48,16 +48,16 @@ def out_generated_image(gen, dis, rows, cols, seed, dst):
         x = x.transpose(0, 2, 3, 1)  # NCHW->NHWCに変形
         x = combine_images(x)
 
-        plt.imshow(x, cmap=plt.cm.gray)
-        plt.axis("off")
-        # plt.grid("off")
+        fig, axes = plt.subplots(nrows=1, ncols=1)
+        axes.imshow(x, cmap=plt.cm.gray)
+        axes.axis("off")
         preview_dir = pathlib.Path('{}/preview'.format(dst))
         preview_path = preview_dir /\
             'image_{:}epoch.jpg'.format(trainer.updater.epoch)
         if not preview_dir.exists():
             preview_dir.mkdir()
-        plt.title("epoch: {}".format(trainer.updater.epoch), fontsize=18)
-        plt.tight_layout()
-        plt.savefig(preview_path)
+        axes.set_title("epoch: {}".format(trainer.updater.epoch), fontsize=18)
+        fig.tight_layout()
+        fig.savefig(preview_path)
 
     return make_image
