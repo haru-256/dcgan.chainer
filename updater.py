@@ -20,7 +20,6 @@ class DCGANUpdater(chainer.training.StandardUpdater):
         # The name "main" is valid when there is one optimizer
         gen_optimizer = self.get_optimizer("gen")
         dis_optimizer = self.get_optimizer("dis")
-
         # obtain batch data
         # get_iterator("main") is SerialIterator so next() returns next minibatch
         batch = self.get_iterator("main").next()
