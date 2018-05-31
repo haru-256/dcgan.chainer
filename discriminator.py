@@ -46,12 +46,10 @@ class Discriminator(chainer.Chain):
             self.l2 = L.Linear(in_size=None, out_size=1, initialW=w)
 
             self.bn1 = L.BatchNormalization(size=128)
-            # self.bn2 = L.BatchNormalization(size=16)
 
     def __call__(self, x):
         h = F.leaky_relu(self.c0(x))
         h = F.leaky_relu(self.bn1(self.c1(h)))
-        # h = F.leaky_relu(self.bn2(self.c2(h)))
         y = self.l2(h)  # conv->linear では勝手にreshapeが適用される
 
         return y

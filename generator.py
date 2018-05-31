@@ -37,7 +37,6 @@ class Generator(chainer.Chain):
 
             self.l0 = L.Linear(in_size=self.n_hidden, out_size=bottom_width *
                                bottom_width * ch, initialW=w, nobias=True)
-            # self.l1 = L.Linear(None, bottom_width * bottom_width * ch, initialW=w)
             self.dc1 = L.Deconvolution2D(
                 in_channels=None,
                 out_channels=ch // 2,
@@ -55,7 +54,6 @@ class Generator(chainer.Chain):
                 initialW=w)  # (1, 28, 28)
             self.bn0 = L.BatchNormalization(bottom_width * bottom_width * ch)
             self.bn1 = L.BatchNormalization(ch // 2)
-            # self.bn2 = L.BatchNormalization(ch // 4)
 
     def make_hidden(self, batchsize):
         """
@@ -73,8 +71,7 @@ class Generator(chainer.Chain):
                           self.bottom_width))  # dataformat is NCHW
         h = F.relu(self.bn1(self.dc1(h)))
         x = F.tanh(self.dc2(h))
-        # h = F.relu(self.bn2(self.dc2(h)))
-        # x = F.tanh(self.dc3(h))
+
         return x
 
 

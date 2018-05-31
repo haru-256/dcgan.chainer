@@ -86,7 +86,7 @@ def main():
         trigger=display_interval)
     trainer.extend(extensions.ProgressBar(update_interval=50))
     trainer.extend(
-        out_generated_image(gen, dis, 10, 10, seed, out),
+        out_generated_image(gen, dis, 7, 7, seed, out),
         trigger=display_interval)
     trainer.extend(
         extensions.PlotReport(
