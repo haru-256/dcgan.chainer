@@ -46,16 +46,6 @@ class Generator(chainer.Chain):
                 pad=1,
                 initialW=w,
                 nobias=True)  # (, 14, 14)
-            """
-            self.dc2 = L.Deconvolution2D(
-                in_channels=None,
-                out_channels=ch // 4,
-                ksize=4,
-                stride=2,
-                pad=1,
-                initialW=w,
-                nobias=True)  # (, 14, 14)
-            """
             self.dc2 = L.Deconvolution2D(
                 in_channels=None,
                 out_channels=1,

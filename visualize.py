@@ -59,5 +59,6 @@ def out_generated_image(gen, dis, rows, cols, seed, dst):
         axes.set_title("epoch: {}".format(trainer.updater.epoch), fontsize=18)
         fig.tight_layout()
         fig.savefig(preview_path)
+        plt.close(fig)  # あまりに図が多いとメモリが圧迫されるので閉じる
 
     return make_image

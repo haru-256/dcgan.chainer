@@ -12,12 +12,12 @@ plt.style.use("ggplot")
 
 
 def main():
-    gpu = -1
+    gpu = 0
     batch_size = 128
     n_hidden = 100
-    epoch = 20
+    epoch = 100
     seed = 0
-    number = 2  # number of experiments
+    number = 1  # number of experiments
     out = "result_{0}_{1}".format(number, seed)
 
     print('GPU: {}'.format(gpu))
@@ -84,7 +84,7 @@ def main():
             'dis/loss',
         ]),
         trigger=display_interval)
-    trainer.extend(extensions.ProgressBar(update_interval=20))
+    trainer.extend(extensions.ProgressBar(update_interval=50))
     trainer.extend(
         out_generated_image(gen, dis, 10, 10, seed, out),
         trigger=display_interval)

@@ -43,16 +43,6 @@ class Discriminator(chainer.Chain):
                 pad=1,
                 initialW=w,
                 nobias=True)
-            """
-            self.c2 = L.Convolution2D(
-                in_channels=None,
-                out_channels=16,
-                ksize=3,
-                stride=2,
-                pad=1,
-                initialW=w,
-                nobias=True)
-            """
             self.l2 = L.Linear(in_size=None, out_size=1, initialW=w)
 
             self.bn1 = L.BatchNormalization(size=128)
