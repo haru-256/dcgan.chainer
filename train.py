@@ -2,18 +2,20 @@ import chainer
 from chainer import training
 from chainer.training import extensions
 
-from discriminator import Discriminator
+# from discriminator import Discriminator
+from discriminator_fm import Discriminator
 from generator import Generator
 # from updater import DCGANUpdater
-from updater_origin import DCGANUpdater
+# from updater_origin import DCGANUpdater
+from updater_fm import DCGANUpdater
 from visualize import out_generated_image
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
 
 
 def main():
-    gpu = 0
-    batch_size = 128
+    gpu = -1
+    batch_size = 130
     n_hidden = 100
     epoch = 100
     seed = 2
@@ -90,7 +92,7 @@ def main():
         trigger=display_interval)
     trainer.extend(
         extensions.PlotReport(
-            ['gen/loss', 'dis/loss'],
+            ['gen/fm_loss', 'dis/loss'],
             x_key='epoch',
             file_name='loss.jpg',
             grid=False))  # grid=Falseとしているのは"ggplot"ではすでにgridが書かれているため．
