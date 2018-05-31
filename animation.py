@@ -2,13 +2,13 @@ from PIL import Image, ImageFilter
 import pathlib
 
 number = 1  # nmber of experiments
-seed = 1  # seed
+seed = 0  # seed
 strings = "{0}_{1}".format(number, seed)
 # Pillow のGIF生成，画像読み込みは以下のサイトを参照
 # https://note.nkmk.me/python-pillow-gif/
 # https://note.nkmk.me/python-pillow-basic/
 #path = pathlib.Path("result_{}/preview".format(strings))
-path = pathlib.Path("./result_updater2/preview")
+path = pathlib.Path("./result_{}/preview".format(strings))
 
 # store image to use as frame to array "imgs"
 imgs = []
