@@ -16,7 +16,7 @@ def main():
     batch_size = 128
     n_hidden = 100
     epoch = 100
-    seed = 0
+    seed = 2
     number = 1  # number of experiments
     out = "result_{0}_{1}".format(number, seed)
 

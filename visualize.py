@@ -48,7 +48,7 @@ def out_generated_image(gen, dis, rows, cols, seed, dst):
         x = x.transpose(0, 2, 3, 1)  # NCHW->NHWCに変形
         x = combine_images(x)
 
-        fig, axes = plt.subplots(nrows=1, ncols=1)
+        fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(5, 4))
         axes.imshow(x, cmap=plt.cm.gray)
         axes.axis("off")
         preview_dir = pathlib.Path('{}/preview'.format(dst))
