@@ -17,10 +17,10 @@ class DCGANUpdater(chainer.training.StandardUpdater):
 
     def update_core(self):
         # get_optimizer mehtod allows to get optimizer
+        # The name "main" is valid when there is one optimizer
         gen_optimizer = self.get_optimizer("gen")
         dis_optimizer = self.get_optimizer("dis")
-        hoge = self.get_optimizer("main")
-        print("main optimizer is", hoge)
+
         # obtain batch data
         # get_iterator("main") is SerialIterator so next() returns next minibatch
         batch = self.get_iterator("main").next()
