@@ -45,6 +45,7 @@ class Minibatch_Discrimination(chainer.Chain):
            input vector shape is (N, num_units)
         """
         batch_size = x.shape[0]
+        x = F.reshape(x, (batch_size, -1))
         activation = F.reshape(self.t(x), (-1, self.b, self.c))
 
         m = F.reshape(activation, (-1, self.b, self.c))
@@ -109,14 +110,16 @@ class Discriminator(chainer.Chain):
                 pad=1,
                 initialW=w,
                 nobias=True)
-            self.l2 = L.Linear(in_size=None, out_size=1, initialW=w)
+            self.md2 = Minibatch_Discrimination(B=32, C=8, wscale=wscale)
+            self.l3 = L.Linear(in_size=None, out_size=1, initialW=w)
 
-            self.bn1 = L.BatchNormalization(size=128)
+            # self.bn1 = L.BatchNormalization(size=128)
 
     def __call__(self, x):
         h = F.leaky_relu(self.c0(x))
-        h = F.leaky_relu(self.bn1(self.c1(h)))
-        y = self.l2(h)  # conv->linear では勝手にreshapeが適用される
+        h = F.leaky_relu(self.c1(h))
+        h = self.md2(h)
+        y = self.l3(h)  # conv->linear では勝手にreshapeが適用される
 
         return y, h  # featureも返す
 
