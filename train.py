@@ -2,23 +2,23 @@ import chainer
 from chainer import training
 from chainer.training import extensions
 
-# from discriminator import Discriminator
-from discriminator_fm import Discriminator
+from discriminator import Discriminator
+# from discriminator_fm import Discriminator
 from generator import Generator
-# from updater import DCGANUpdater
+from updater import DCGANUpdater
 # from updater_origin import DCGANUpdater
-from updater_fm import DCGANUpdater
+# from updater_fm import DCGANUpdater
 from visualize import out_generated_image
 import matplotlib.pyplot as plt
 plt.style.use("ggplot")
 
 
 def main():
-    gpu = -1
-    batch_size = 130
+    gpu = 0
+    batch_size = 128
     n_hidden = 100
     epoch = 100
-    seed = 2
+    seed = 0
     number = 1  # number of experiments
     out = "result_{0}_{1}".format(number, seed)
 
@@ -58,6 +58,7 @@ def main():
     updater = DCGANUpdater(
         models=(gen, dis),
         iterator=train_iter,
+        lam=1,
         optimizer={
             'gen': opt_gen,
             'dis': opt_dis
@@ -67,6 +68,8 @@ def main():
 
     snapshot_interval = (5, 'epoch')
     display_interval = (1, 'epoch')
+    trainer.extend(extensions.dump_graph("gen/loss", out_name="gen.dot"))
+    trainer.extend(extensions.dump_graph("dis/loss", out_name="dis.dot"))
     trainer.extend(
         extensions.snapshot(
             filename='snapshot_epoch_{.updater.epoch}.npz'),
@@ -92,9 +95,9 @@ def main():
         trigger=display_interval)
     trainer.extend(
         extensions.PlotReport(
-            ['gen/fm_loss', 'dis/loss'],
+            ['gen/loss', 'dis/loss'],
             x_key='epoch',
-            file_name='loss.jpg',
+            file_name='loss_{0}_{1}.jpg'.format(number, seed),
             grid=False))  # grid=Falseとしているのは"ggplot"ではすでにgridが書かれているため．
     # 詳細は https://github.com/chainer/chainer/blob/v4.1.0/chainer/training/extensions/plot_report.py#L153-L154 参照
 
