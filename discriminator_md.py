@@ -45,6 +45,8 @@ class Minibatch_Discrimination(chainer.Chain):
            input vector shape is (N, num_units)
         """
         batch_size = x.shape[0]
+        xp = x.xp
+        x = F.reshape(x, (batch_size, -1))
         activation = F.reshape(self.t(x), (-1, self.b, self.c))
 
         m = F.reshape(activation, (-1, self.b, self.c))
@@ -54,7 +56,7 @@ class Minibatch_Discrimination(chainer.Chain):
         l1_norm = F.sum(F.absolute(m-m_T), axis=2)
 
         # eraser to erase l1 norm with themselves
-        eraser = F.expand_dims(np.eye(batch_size, dtype="f"), 1)
+        eraser = F.expand_dims(xp.eye(batch_size, dtype="f"), 1)
         eraser = F.broadcast_to(eraser, (batch_size, self.b, batch_size))
 
         o_X = F.sum(F.exp(-(l1_norm + 1e6 * eraser)), axis=2)
@@ -76,6 +78,13 @@ class Discriminator(chainer.Chain):
 
     wscale: float
         std of normal initializer
+
+    B: int 
+        number of rows of M
+
+    C: int
+        number of columns of M
+
     Attributes
     ---------------------
 
@@ -87,8 +96,9 @@ class Discriminator(chainer.Chain):
         feature of one befor the out layer
     """
 
-    def __init__(self, in_ch=1, wscale=0.02):
+    def __init__(self, in_ch=1, wscale=0.02, B=32, C=8):
         super(Discriminator, self).__init__()
+        self.b, self.c = B, C
         with self.init_scope():
             # initializers
             w = chainer.initializers.Normal(wscale)
@@ -109,16 +119,18 @@ class Discriminator(chainer.Chain):
                 pad=1,
                 initialW=w,
                 nobias=True)
-            self.l2 = L.Linear(in_size=None, out_size=1, initialW=w)
+            self.md2 = Minibatch_Discrimination(self.b, self.c, wscale)
+            self.l3 = L.Linear(in_size=None, out_size=1, initialW=w)
 
-            self.bn1 = L.BatchNormalization(size=128)
+            # self.bn1 = L.BatchNormalization(size=128)
 
     def __call__(self, x):
         h = F.leaky_relu(self.c0(x))
-        h = F.leaky_relu(self.bn1(self.c1(h)))
-        y = self.l2(h)  # conv->linear では勝手にreshapeが適用される
+        h = F.leaky_relu(self.c1(h))
+        h = self.md2(h)
+        y = self.l3(h)  # conv->linear では勝手にreshapeが適用される
 
-        return y, h  # featureも返す
+        return y
 
 
 if __name__ == "__main__":
@@ -126,7 +138,7 @@ if __name__ == "__main__":
     from chainer import Variable
     import numpy as np
 
-    z = np.random.uniform(-1, 1, (1, 1, 28, 28)).astype("f")
+    z = np.random.uniform(-1, 1, (10, 1, 28, 28)).astype("f")
     model = Discriminator()
     img = model(Variable(z))
     # print(img)

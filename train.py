@@ -2,8 +2,9 @@ import chainer
 from chainer import training
 from chainer.training import extensions
 
-from discriminator import Discriminator
+# from discriminator import Discriminator
 # from discriminator_fm import Discriminator
+from discriminator_md import Discriminator
 from generator import Generator
 from updater import DCGANUpdater
 # from updater_origin import DCGANUpdater
@@ -19,7 +20,7 @@ def main():
     n_hidden = 100
     epoch = 100
     seed = 0
-    number = 1  # number of experiments
+    number = 4  # number of experiments
     out = "result_{0}_{1}".format(number, seed)
 
     print('GPU: {}'.format(gpu))
@@ -58,7 +59,6 @@ def main():
     updater = DCGANUpdater(
         models=(gen, dis),
         iterator=train_iter,
-        lam=1,
         optimizer={
             'gen': opt_gen,
             'dis': opt_dis

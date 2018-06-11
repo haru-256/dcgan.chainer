@@ -52,8 +52,12 @@ class DCGANUpdater(chainer.training.StandardUpdater):
 
         # dis, genをそれぞれ最適化
         dis_optimizer.update(self.loss_dis, dis, y_fake, y_real)
+        """
         gen_optimizer.update(self.loss_gen_fm, gen,
-                             real_fm_expected, fake_fm_expected, self.lam)  # gen_fmのLossを使用
+                             real_fm_expected, fake_fm_expected)  # gen_fmのLossを使用
+        """
+        gen_optimizer.update(self.loss_gen, gen,
+                             y_fake, real_fm_expected, fake_fm_expected, self.lam)  # fm + original
 
     def loss_dis(self, dis, y_fake, y_real):
         batchsize = len(y_fake)
