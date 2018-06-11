@@ -30,7 +30,7 @@ strings = "{0}_{1}".format(number, seed)
 # https://note.nkmk.me/python-pillow-gif/
 # https://note.nkmk.me/python-pillow-basic/
 #path = pathlib.Path("result_{}/preview".format(strings))
-path = pathlib.Path("./result_{}/preview".format(strings))
+path = pathlib.Path("./result_{0}/result_{1}/preview".format(number, strings))
 
 # store image to use as frame to array "imgs"
 imgs = []
@@ -39,5 +39,6 @@ for epoch in range(1, 101):
     imgs.append(img)
 
 # make gif
-imgs[0].save('result_{0}/anim_{0}.gif'.format(strings), save_all=True, append_images=imgs[1:],
+imgs[0].save('result_{0}/result_{1}/anim_{1}.gif'.format(number, strings),
+             save_all=True, append_images=imgs[1:],
              optimize=False, duration=200, loop=0)
