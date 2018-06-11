@@ -45,23 +45,29 @@ class Minibatch_Discrimination(chainer.Chain):
            input vector shape is (N, num_units)
         """
         batch_size = x.shape[0]
-        x = F.reshape(x, (batch_size, -1))
-        activation = F.reshape(self.t(x), (-1, self.b, self.c))
 
-        m = F.reshape(activation, (-1, self.b, self.c))
-        m = F.expand_dims(m, 3)
-        m_T = F.transpose(m, (3, 1, 2, 0))
-        m, m_T = F.broadcast(m, m_T)
-        l1_norm = F.sum(F.absolute(m-m_T), axis=2)
 
-        # eraser to erase l1 norm with themselves
-        eraser = F.expand_dims(np.eye(batch_size, dtype="f"), 1)
-        eraser = F.broadcast_to(eraser, (batch_size, self.b, batch_size))
+<< << << < HEAD
+== == == =
+    xp = x.xp
+>>>>>> > f2b65f72c0d92f2e3263f25275bc04accbdec561
+    x = F.reshape(x, (batch_size, -1))
+    activation = F.reshape(self.t(x), (-1, self.b, self.c))
 
-        o_X = F.sum(F.exp(-(l1_norm + 1e6 * eraser)), axis=2)
+    m = F.reshape(activation, (-1, self.b, self.c))
+    m = F.expand_dims(m, 3)
+    m_T = F.transpose(m, (3, 1, 2, 0))
+    m, m_T = F.broadcast(m, m_T)
+    l1_norm = F.sum(F.absolute(m-m_T), axis=2)
 
-        # concatunate along channels or units
-        return F.concat((x, o_X), axis=1)
+    # eraser to erase l1 norm with themselves
+    eraser = F.expand_dims(xp.eye(batch_size, dtype="f"), 1)
+    eraser = F.broadcast_to(eraser, (batch_size, self.b, batch_size))
+
+    o_X = F.sum(F.exp(-(l1_norm + 1e6 * eraser)), axis=2)
+
+    # concatunate along channels or units
+    return F.concat((x, o_X), axis=1)
 
 
 class Discriminator(chainer.Chain):
@@ -77,6 +83,13 @@ class Discriminator(chainer.Chain):
 
     wscale: float
         std of normal initializer
+
+    B: int 
+        number of rows of M
+
+    C: int
+        number of columns of M
+
     Attributes
     ---------------------
 
@@ -88,8 +101,9 @@ class Discriminator(chainer.Chain):
         feature of one befor the out layer
     """
 
-    def __init__(self, in_ch=1, wscale=0.02):
+    def __init__(self, in_ch=1, wscale=0.02, B=32, C=8):
         super(Discriminator, self).__init__()
+        self.b, self.c = B, C
         with self.init_scope():
             # initializers
             w = chainer.initializers.Normal(wscale)
@@ -110,7 +124,7 @@ class Discriminator(chainer.Chain):
                 pad=1,
                 initialW=w,
                 nobias=True)
-            self.md2 = Minibatch_Discrimination(B=32, C=8, wscale=wscale)
+            self.md2 = Minibatch_Discrimination(self.b, self.c, wscale)
             self.l3 = L.Linear(in_size=None, out_size=1, initialW=w)
 
             # self.bn1 = L.BatchNormalization(size=128)
@@ -121,7 +135,7 @@ class Discriminator(chainer.Chain):
         h = self.md2(h)
         y = self.l3(h)  # conv->linear では勝手にreshapeが適用される
 
-        return y, h  # featureも返す
+        return y
 
 
 if __name__ == "__main__":
@@ -129,7 +143,7 @@ if __name__ == "__main__":
     from chainer import Variable
     import numpy as np
 
-    z = np.random.uniform(-1, 1, (1, 1, 28, 28)).astype("f")
+    z = np.random.uniform(-1, 1, (10, 1, 28, 28)).astype("f")
     model = Discriminator()
     img = model(Variable(z))
     # print(img)
