@@ -11,8 +11,8 @@ plt.style.use("ggplot")
 if __name__ == '__main__':
     # パーサーを作る
     parser = argparse.ArgumentParser(
-        prog='argparseTest',  # プログラム名
-        usage='Demonstration of argparser',  # プログラムの利用方法
+        prog='train',  # プログラム名
+        usage='train DCGAN',  # プログラムの利用方法
         description='description',  # 引数のヘルプの前に表示
         epilog='end',  # 引数のヘルプの後で表示
         add_help=True,  # -h/–help オプションの追加
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     elif args.discriminator == 2:
         print("# Discriminator applied matching")
         from discriminator_fm import Discriminator
-        from updater_fm import DCGANUpdatera
+        from updater_fm import DCGANUpdater
 
     print('')
 
