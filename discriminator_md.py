@@ -46,8 +46,7 @@ class Minibatch_Discrimination(chainer.Chain):
         """
         batch_size = x.shape[0]
 
-
-    	xp = x.xp
+    	xp = chainer.backends.cuda.get_array_module(x)
     	x = F.reshape(x, (batch_size, -1))
     	activation = F.reshape(self.t(x), (-1, self.b, self.c))
 
