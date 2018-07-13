@@ -45,24 +45,24 @@ class Minibatch_Discrimination(chainer.Chain):
            input vector shape is (N, num_units)
         """
         batch_size = x.shape[0]
-        xp = x.xp
-        x = F.reshape(x, (batch_size, -1))
-        activation = F.reshape(self.t(x), (-1, self.b, self.c))
+    	xp = x.xp
+    	x = F.reshape(x, (batch_size, -1))
+    	activation = F.reshape(self.t(x), (-1, self.b, self.c))
 
-        m = F.reshape(activation, (-1, self.b, self.c))
-        m = F.expand_dims(m, 3)
-        m_T = F.transpose(m, (3, 1, 2, 0))
-        m, m_T = F.broadcast(m, m_T)
-        l1_norm = F.sum(F.absolute(m-m_T), axis=2)
+    	m = F.reshape(activation, (-1, self.b, self.c))
+    	m = F.expand_dims(m, 3)
+    	m_T = F.transpose(m, (3, 1, 2, 0))
+    	m, m_T = F.broadcast(m, m_T)
+    	l1_norm = F.sum(F.absolute(m-m_T), axis=2)
 
-        # eraser to erase l1 norm with themselves
-        eraser = F.expand_dims(xp.eye(batch_size, dtype="f"), 1)
-        eraser = F.broadcast_to(eraser, (batch_size, self.b, batch_size))
+    	# eraser to erase l1 norm with themselves
+    	eraser = F.expand_dims(xp.eye(batch_size, dtype="f"), 1)
+    	eraser = F.broadcast_to(eraser, (batch_size, self.b, batch_size))
 
-        o_X = F.sum(F.exp(-(l1_norm + 1e6 * eraser)), axis=2)
+    	o_X = F.sum(F.exp(-(l1_norm + 1e6 * eraser)), axis=2)
 
-        # concatunate along channels or units
-        return F.concat((x, o_X), axis=1)
+    	# concatunate along channels or units
+    	return F.concat((x, o_X), axis=1)
 
 
 class Discriminator(chainer.Chain):
