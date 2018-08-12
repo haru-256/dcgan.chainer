@@ -32,6 +32,9 @@ class DCGANUpdater(chainer.training.StandardUpdater):
             batch, self.device))  # self.converter() is concat_example()
         x_real = (x_real - 127.5) / 127.5
 
+        assert (x_real.data > -1).all() and (x_real.data <
+                                             1).all(), "data range is not from -1 to 1."
+
         xp = chainer.backends.cuda.get_array_module(
             x_real.data)  # return cupy or numpy based on type of x_real.data
 
