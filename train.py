@@ -29,8 +29,9 @@ if __name__ == '__main__':
                         type=int, default=100)
     parser.add_argument('-bs', '--batch_size', help='batch size. defalut value is 128',
                         type=int, default=120)
-    parser.add_argument('-g', '--gpu', help='specify gpu by this number. defalut value is 0',
-                        choices=[0, 1], type=int, default=0)
+    parser.add_argument('-g', '--gpu', help='specify gpu by this number. defalut value is 0'
+                        'any of following; 0: gpu-0, 1: gpu-1, -1: no gpu',
+                        choices=[-1, 0, 1], type=int, default=0)
     parser.add_argument('-dis', '--discriminator',
                         help='specify discriminator by this number. any of following;'
                         ' 0: original, 1: minibatch discriminatio, 2: feature matching. defalut value is 0',
